@@ -513,15 +513,16 @@
     P.changes.push(desc);
     // si se rompe de nuevo, hay que volver a verificar
     if (P.verified && !CUR.t.fixed(CUR.net)) { P.verified = false; P.fixed = false; toast("⚠️ Ese cambio ha vuelto a romper algo: verifica de nuevo", "bad"); }
-    if (!cli) toast("Cambio aplicado", "info");
+    if (!P.verified && CUR.t.howVerify && CUR.t.fixed(CUR.net)) setTimeout(() => toast(`👍 Parece arreglado. Ahora verifícalo: ${CUR.t.howVerify}`, "ok"), 400);
+    else if (!cli) toast("Cambio aplicado", "info");
     save(); paintMap(); renderPhases();
   }
   function phases() {
     const P = CUR.parts || {}, a = CUR.t.answer;
     return [
       { k: "Observar", done: true },
-      { k: "Comprobar", done: (P.diag || 0) >= 2 },
-      { k: "Localizar", done: (P.touched || []).includes(a.device) },
+      { k: "Comprobar", done: (P.diag || 0) >= 2 || !!P.verified },
+      { k: "Localizar", done: (P.touched || []).includes(a.device) || !!P.verified },
       { k: "Corregir", done: !!P.verified },
       { k: "Verificar", done: !!P.verified },
       { k: "Documentar", done: !!P.report },
@@ -530,6 +531,18 @@
   function renderPhases() {
     const el = $(".phasebar", app); if (!el) return;
     el.innerHTML = phases().map((p, i) => `<li class="${p.done ? "done" : ""}"><span>${p.done ? "✓" : i + 1}</span>${p.k}</li>`).join("");
+    // Siguiente paso: siempre dice al alumno qué le falta, aunque haya corregido antes de diagnosticar
+    const ns = $("#nextStep", app);
+    if (ns && CUR.t.howVerify) {
+      const P = CUR.parts;
+      let fixedNow = false; try { fixedNow = CUR.t.fixed(CUR.net); } catch (e) {}
+      const [cls, txt] = P.report ? ["done", "✓ Incidencia cerrada. Pasa al siguiente ticket."]
+        : P.verified ? ["go", "✓ Verificado. <b>Último paso:</b> pulsa «Cerrar incidencia» y rellena el parte."]
+        : fixedNow ? ["go", `La configuración ya parece correcta. <b>Siguiente paso:</b> verifícalo; ${CUR.t.howVerify}.`]
+        : (P.changes || []).length ? ["wait", `Todavía no funciona. Sigue comprobando y, cuando lo corrijas, ${CUR.t.howVerify} para verificarlo.`]
+        : ["wait", `Comprueba el síntoma con comandos en los equipos afectados, localiza el fallo y corrígelo. Para verificar: ${CUR.t.howVerify}.`];
+      ns.className = "next-step " + cls; ns.innerHTML = txt;
+    }
     const btn = $("#closeBtn", app);
     if (btn) { btn.disabled = !CUR.parts.verified || !!CUR.parts.report; btn.textContent = CUR.parts.report ? "✓ Incidencia cerrada" : CUR.parts.verified ? "📝 Cerrar incidencia" : "📝 Cerrar incidencia (primero corrige y verifica)"; }
   }
@@ -596,7 +609,7 @@
     save(); updateHUD();
     app.innerHTML = `<section class="room enter ticket">
       <div class="room-head"><span class="eyebrow">TICKET ${idx + 1} DE ${TK.length} · ${esc(t.place)}</span><h2>${t.title}</h2></div>
-      <ol class="phasebar"></ol>
+      <ol class="phasebar"></ol><p class="next-step" id="nextStep" role="status"></p>
       <div class="ticket-grid">
         <aside class="side">
           <div class="card ticket-card"><div class="tk-head"><span class="tk-prio">PRIORIDAD ALTA</span><span class="mono">#${S.groupCode}-${idx + 1}</span></div>

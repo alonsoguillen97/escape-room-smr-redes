@@ -161,3 +161,6 @@ main { max-width: 1320px; }
 .bars i { width: 5px; background: var(--gray); border-radius: 1px; }
 .bars i.on { background: var(--navy); }
 [hidden] { display: none !important; }
+.next-step { margin: -6px 0 16px; padding: 10px 14px; border: 2.5px solid var(--navy); border-radius: 12px; font-weight: 600; background: #fff; }
+.next-step.go { background: var(--lime); }
+.next-step.done { background: var(--lime-light); }

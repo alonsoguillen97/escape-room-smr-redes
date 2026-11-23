@@ -416,7 +416,16 @@
     };
     // Evidencias admitidas: cualquier comando razonable para ese fallo
     const moreCmds = { t2: ["ping"], t3: ["show running-config"], t5: ["ping"] };
-    for (const t of list) { t.hints.push(last[t.id]); if (moreCmds[t.id]) t.answer.cmds.push(...moreCmds[t.id]); }
+    // Qué ping concreto da por verificada la incidencia (se muestra al alumno cuando ya parece arreglada)
+    const howVerify = {
+      t1: `haz ping desde ${t1h} a un equipo de otra oficina`,
+      t2: `haz ping desde un equipo de ${LL2.dept} a otra oficina`,
+      t3: "haz ping desde AULA-1 a un equipo de Secretaría",
+      t4: "haz ping desde PORTATIL a un equipo de otra oficina",
+      t5: "haz ping entre un equipo de Secretaría y uno de Dirección",
+      t6: `haz ping desde ${t6h} a un equipo de otra oficina`,
+    };
+    for (const t of list) { t.hints.push(last[t.id]); if (moreCmds[t.id]) t.answer.cmds.push(...moreCmds[t.id]); t.howVerify = howVerify[t.id]; }
     return list;
   }
 
