@@ -26,17 +26,16 @@
   function main() {
     root.innerHTML = `<span class="eyebrow">PANEL DEL PROFESOR · 1º SMR · UD3</span><h1>OPERACIÓN <span class="hl">RECONEXIÓN</span></h1>
       <div class="tabs" role="tablist">
-        <button class="btn" role="tab" data-tab="rank" aria-selected="true">🏆 Ranking en directo</button>
+        <button class="btn" role="tab" data-tab="rank" aria-selected="true">🏆 Ranking</button>
         <button class="btn" role="tab" data-tab="check" aria-selected="false">✅ Comprobar PDF</button>
         <button class="btn" role="tab" data-tab="sol" aria-selected="false">🔎 Solucionario</button>
-        <button class="btn" role="tab" data-tab="setup" aria-selected="false">⚙️ Configurar ranking</button>
       </div><section class="card panel" id="view"></section>`;
     root.querySelectorAll("[data-tab]").forEach((b) => (b.onclick = () => {
       root.querySelectorAll("[data-tab]").forEach((x) => x.setAttribute("aria-selected", String(x === b)));
       clearInterval(timer);
-      ({ rank, check, sol, setup })[b.dataset.tab]();
+      ({ rank, check, sol })[b.dataset.tab]();
     }));
-    C.RANKING_URL ? rank() : setup();
+    rank();
   }
 
   /* ---------- Ranking en directo ---------- */
@@ -52,39 +51,53 @@
       return { ...list[0], attempts: list.length };
     }).sort((a, b) => (b.tickets - a.tickets) || (b.score - a.score) || (a.updated - b.updated));
   }
+  /* Ranking a partir de los códigos de los PDF: se guardan en este navegador y se acumulan */
+  const RK = "reconexion.prof.codes";
+  const getCodes = () => { try { return JSON.parse(localStorage.getItem(RK)) || []; } catch (e) { return []; } };
+  const setCodes = (c) => { try { localStorage.setItem(RK, JSON.stringify(c)); } catch (e) {} };
   async function rank() {
     const v = $("#view");
-    if (!C.RANKING_URL) { v.innerHTML = `<p>El ranking automático aún no está configurado. Ve a <b>⚙️ Configurar ranking</b>.</p>`; return; }
-    v.innerHTML = `<div class="rank-top"><h2>Ranking en directo</h2><div class="toolbar"><span class="small muted" id="upd">Cargando…</span><button class="btn ghost" id="fs" type="button">⛶ Pantalla completa</button><button class="btn ghost" id="csv" type="button">⬇️ CSV</button></div></div><div id="rk"></div>`;
+    v.innerHTML = `<div class="rank-top"><h2>Ranking de la clase</h2><div class="toolbar"><button class="btn ghost" id="fs" type="button">⛶ Pantalla completa</button><button class="btn ghost" id="csv" type="button">⬇️ CSV</button><button class="btn ghost" id="clr" type="button">🗑 Vaciar</button></div></div>
+      <p class="muted small">Pega los <b>códigos de verificación</b> de los PDF que suban al campus (empiezan por <code>OR.</code>, están al pie de cada página). Puedes pegar varios a la vez, o un texto que los contenga. Se guardan en este navegador y se van sumando: de cada alumno cuenta su mejor informe (los finales antes que los parciales).</p>
+      <textarea id="codes" placeholder="OR.xxxxx.XXXXXXXX"></textarea><div class="toolbar"><button class="btn" id="add">Añadir al ranking</button><span class="small muted" id="upd"></span></div><div id="rk"></div>`;
     $("#fs").onclick = () => (document.fullscreenElement ? document.exitFullscreen() : v.requestFullscreen && v.requestFullscreen());
     let last = [];
-    $("#csv").onclick = () => {
-      const lines = [["Alumno/a", "Puntos", "Tickets", "Pistas", "Partes erróneos", "Terminado", "Intentos", "Código", "Última actualización", "Firma válida"].join(";")]
-        .concat(last.map((r) => [r.name, r.score, r.tickets, r.hints, r.errors, r.finished ? "Sí" : "No", r.attempts, r.code, fmt(r.updated), r.verified ? "Sí" : "NO"].join(";")));
-      const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿" + lines.join("\n")], { type: "text/csv" })); a.download = "ranking_codigo_rojo.csv"; a.click();
-    };
     const load = async () => {
-      try {
-        const r = await CN.readRank(PIN);
-        if (r.error) { $("#upd").textContent = "PIN no válido"; return; }
-        last = best(r.rows || []);
-        draw(last);
-        $("#upd").textContent = `Actualizado ${new Date().toLocaleTimeString("es-ES")} · se refresca cada 15 s`;
-      } catch (e) { $("#upd").textContent = "No se pudo leer el ranking (reintentando…)"; }
+      const rows = [];
+      let bad = 0;
+      for (const c of getCodes()) {
+        const r = await CN.parseFinishCode(c);
+        if (!r) { bad++; continue; }
+        rows.push({ name: r.team, code: r.group, score: r.score, tickets: r.tickets, hints: r.hints, errors: r.errors, finished: !r.partial, updated: r.end, verified: r.valid, grade: r.grade, minutes: Math.round(r.elapsed / 60) });
+      }
+      last = best(rows.filter((r) => r.verified)).concat(rows.filter((r) => !r.verified).map((r) => ({ ...r, attempts: 1 })));
+      draw(last);
+      $("#upd").textContent = `${getCodes().length} código(s) guardado(s)${bad ? ` · ${bad} no reconocido(s)` : ""}${rows.some((r) => !r.verified) ? " · los manipulados aparecen en rojo al final" : ""}`;
+    };
+    $("#add").onclick = async () => {
+      const found = ($("#codes").value.match(/OR\.[A-Za-z0-9_-]+\.[A-Za-z0-9]{8}/g) || []);
+      if (!found.length) { $("#upd").textContent = "No he encontrado ningún código OR. en el texto pegado."; return; }
+      setCodes(Array.from(new Set(getCodes().concat(found))));
+      $("#codes").value = ""; await load();
+    };
+    $("#clr").onclick = async () => { if (confirm("¿Vaciar el ranking guardado en este navegador?")) { setCodes([]); await load(); } };
+    $("#csv").onclick = () => {
+      const lines = [["Alumno/a", "Nota", "Puntos", "Tickets", "Pistas", "Partes erróneos", "Minutos", "Informe", "Código", "Fecha", "Firma válida"].join(";")]
+        .concat(last.map((r) => [r.name, r.grade == null ? "" : CN.fmtGrade(r.grade), r.score, r.tickets, r.hints, r.errors, r.minutes, r.finished ? "Final" : "Parcial", r.code, fmt(r.updated), r.verified ? "Sí" : "NO"].join(";")));
+      const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv" })); a.download = "ranking_reconexion.csv"; a.click();
     };
     await load();
-    timer = setInterval(load, 15000);
   }
   function draw(rows) {
     const fin = rows.filter((r) => r.finished).sort((a, b) => b.score - a.score);
     const pod = [fin[1], fin[0], fin[2]];
     $("#rk").innerHTML = `
       ${fin.length ? `<h3>Podio (terminados)</h3><div class="podium">${pod.map((x, i) => (x ? `<div class="pod p${[2, 1, 3][i]}"><div class="bar">${[2, 1, 3][i]}</div><b>${esc(x.name)}</b><span>${x.score} pts</span></div>` : "<div></div>")).join("")}</div>` : ""}
-      <p class="small muted">${rows.length} alumno(s) · ${fin.length} han terminado. Se muestra el mejor intento de cada alumno.</p>
-      <table><thead><tr><th>#</th><th>Alumno/a</th><th>Progreso</th><th>Puntos</th><th>Pistas</th><th>Partes erróneos</th><th>Estado</th><th>Últ. actividad</th><th></th></tr></thead><tbody>
+      <p class="small muted">${rows.length} alumno(s) · ${fin.length} han terminado. De cada alumno se muestra su mejor informe.</p>
+      <table><thead><tr><th>#</th><th>Alumno/a</th><th>Progreso</th><th>Nota</th><th>Puntos</th><th>Pistas</th><th>Partes erróneos</th><th>Informe</th><th>Fecha</th><th></th></tr></thead><tbody>
       ${rows.map((x, i) => `<tr class="${x.verified ? "" : "invalid"}"><td>${i + 1}</td><td><b>${esc(x.name)}</b>${x.attempts > 1 ? `<br><span class="small muted">${x.attempts} intentos</span>` : ""}</td>
         <td><div class="tk-bar">${Array.from({ length: CN.NT }, (_, k) => k).map((k) => `<i class="${k < x.tickets ? "on" : ""}"></i>`).join("")}</div><span class="small">${x.tickets}/${CN.NT}</span></td>
-        <td><b>${x.score}</b></td><td>${x.hints}</td><td>${x.errors}</td><td>${x.finished ? "✅ Terminado" : "⏳ En curso"}</td><td class="mono">${fmt(x.updated)}</td><td>${x.verified ? "" : "⚠ firma no válida"}</td></tr>`).join("") || `<tr><td colspan="9">Todavía no hay alumnos conectados.</td></tr>`}
+        <td><b>${x.grade == null ? "-" : CN.fmtGrade(x.grade)}</b></td><td><b>${x.score}</b></td><td>${x.hints}</td><td>${x.errors}</td><td>${x.finished ? "✅ Final" : "⏳ Parcial"}</td><td class="mono">${fmt(x.updated)}</td><td>${x.verified ? "" : "❌ PDF manipulado"}</td></tr>`).join("") || `<tr><td colspan="10">Todavía no hay informes. Pega arriba los códigos de los PDF.</td></tr>`}
       </tbody></table>`;
   }
 
@@ -119,18 +132,5 @@
     };
   }
 
-  /* ---------- Instrucciones de configuración ---------- */
-  function setup() {
-    $("#view").innerHTML = `<h2>Configurar el ranking automático (una sola vez, 5 minutos)</h2>
-      <p>Estado: ${C.RANKING_URL ? `<b>✅ configurado</b> · <code class="small">${esc(C.RANKING_URL.slice(0, 60))}…</code>` : "<b>❌ sin configurar</b> (el juego funciona, pero no envía resultados)"}</p>
-      <ol class="setup-steps">
-        <li>Crea una <b>Hoja de cálculo de Google</b> nueva con tu cuenta (por ejemplo «Ranking Operación Reconexión»).</li>
-        <li>En la hoja: <b>Extensiones → Apps Script</b>. Borra lo que haya y pega el contenido de <a href="apps-script/Codigo.gs" target="_blank" rel="noopener">apps-script/Codigo.gs</a>.</li>
-        <li>Cambia la línea <code>const PIN = "CAMBIA-ESTE-PIN";</code> por un PIN tuyo. Guarda (💾).</li>
-        <li><b>Implementar → Nueva implementación →</b> tipo <b>Aplicación web</b>. Ejecutar como: <b>Yo</b>. Quién tiene acceso: <b>Cualquier usuario</b>. Pulsa Implementar y autoriza los permisos.</li>
-        <li>Copia la <b>URL de la aplicación web</b> (termina en <code>/exec</code>) y pásamela: la pongo en <code>js/core.js</code> (<code>RANKING_URL</code>) y lo vuelvo a publicar.</li>
-      </ol>
-      <p class="small muted">Los resultados quedan en tu hoja de Google (pestaña «Resultados»): nombre, puntos, tickets, pistas y errores. Solo quien tenga tu PIN puede leerlos desde este panel.</p>`;
-  }
   gate();
 })();

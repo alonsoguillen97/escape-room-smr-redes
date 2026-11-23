@@ -25,11 +25,10 @@ Cada ticket sigue las fases **Observar → Comprobar → Localizar → Corregir 
 ## Archivos
 ```
 index.html      Juego del alumnado
-profesor.html   Ranking, Comprobar PDF y Solucionario por alumno (PIN 1SMR mientras no haya ranking)
+profesor.html   Ranking a partir de los PDF, Comprobar PDF y Solucionario por alumno (PIN 1SMR)
 js/net.js       Simulador: rutas C/L/S, DHCP, decisión local/remoto, ping, tracert, CLI IOS
 js/core.js      Red base, WiFi, 6 tickets con variantes, CONFIG (secreto, PIN, puntos, nota)
 js/app.js       Interfaz: mapa, consola flotante, PC Wireless, panel del AP, partes e informe PDF
-apps-script/    Código del ranking automático (Google Sheets)
 ```
 
 ## Nota sobre 10, puntos y rapidez
@@ -39,9 +38,5 @@ apps-script/    Código del ranking automático (Google Sheets)
 - El botón 📄 descarga el informe en cualquier momento. Antes de terminar sale como **PARCIAL**.
 - El código de verificación del pie del PDF empieza por `OR.` y se comprueba en el panel del profesor.
 
-## Ranking automático (opcional)
-1. Crea una hoja de cálculo de Google y abre *Extensiones → Apps Script*. Pega `apps-script/Codigo.gs` y cambia el PIN.
-2. Ve a *Implementar → Nueva implementación → Aplicación web*. Ejecutar como **Yo**; acceso: **Cualquier usuario**.
-3. Pon la URL `/exec` en `RANKING_URL` de `js/core.js` y publica.
-
-Es una hoja distinta de la de Código Rojo (ASIR), porque cada actividad firma con su propio secreto.
+## Ranking de la clase (sin hojas de cálculo)
+No se envía nada a ningún servidor: todo ocurre en el navegador del alumno. El alumno descarga su PDF y lo sube al campus. En `profesor.html` → **Ranking**, pegas los códigos `OR.` de los PDF y el panel monta la clasificación con la nota, los puntos, los tickets, el tiempo y la autenticidad de cada informe. De cada alumno cuenta su mejor informe. Los códigos se guardan en el navegador del profesor y se pueden exportar a CSV.

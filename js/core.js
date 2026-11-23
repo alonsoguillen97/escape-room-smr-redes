@@ -9,7 +9,7 @@
   const CONFIG = {
     SECRET: "RECONEXION|1SMR|RL|UD3|v1", // cámbialo cada curso
     TEACHER_PIN: "1SMR",                 // solo para el panel si NO hay ranking automático
-    RANKING_URL: "",                     // URL /exec de la aplicación web de Apps Script (ver README)
+    RANKING_URL: "",                     // vacío: no se envía nada fuera; el ranking se monta en el panel con los códigos de los PDF
     // Nota sobre 10 que aparece en el informe PDF: 6 tickets × 1,4 + 1,6 por rapidez
     GRADE: { TICKET: 1.4, HINT: 0.2, WRONG: 0.2, MIN_CLOSED: 0.7, VERIFIED_ONLY: 0.7, SPEED: 1.6 },
     // Rapidez según minutos de trabajo activo: <= FAST_MIN → máximo; >= SLOW_MIN → 0; lineal entre medias
