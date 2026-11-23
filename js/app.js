@@ -554,8 +554,8 @@
       const v = { cat: f.cat.value, device: f.device.value, cause: f.cause.value, cmd: f.cmd.value, why: f.why.value.trim() };
       if (!v.cat || !v.device || !v.cause || !v.cmd) return toast("Completa los cuatro primeros apartados", "info");
       if (v.why.length < 15) return toast("Escribe una justificación breve (al menos una frase)", "info");
-      const wrong = [![].concat(t.answer.cat).includes(v.cat) && "tipo", v.device !== t.answer.device && "dispositivo", v.cause !== t.answer.cause && "causa", !t.answer.cmds.includes(v.cmd) && "comando"].filter(Boolean);
-      if (wrong.length) { fail(`El parte tiene ${wrong.length} apartado${wrong.length > 1 ? "s" : ""} incorrecto${wrong.length > 1 ? "s" : ""}`); return; }
+      const wrong = [![].concat(t.answer.cat).includes(v.cat) && "tipo", v.device !== t.answer.device && "dispositivo", v.cause !== t.answer.cause && "causa", !t.answer.cmds.includes(v.cmd) && "comando de evidencia"].filter(Boolean);
+      if (wrong.length) { fail(`Revisa en el parte: ${wrong.join(", ")}`); return; }
       P.report = { ...v, causeText: t.causes.find((c) => c.id === v.cause).t };
       save(); pn.close(); completeTicket();
     };
@@ -668,7 +668,7 @@
     app.innerHTML = `<section class="intro"><div class="intro-card card">
       <span class="eyebrow">CITED · REDES LOCALES · 1º SMR · UD3</span>
       <h1>OPERACIÓN<br><span class="hl">RECONEXIÓN</span></h1>
-      <p class="lead">Lunes, 8:00. Fin de semana de obras en CITED: han movido equipos, han tocado routers y alguien ha «configurado» la WiFi del Taller. Hoy nadie se comunica con nadie y Dirección quiere además el aula nueva funcionando. Eres el técnico de la red. Tienes <b>${CN.NT} tickets</b> y una regla: <b>estar conectado no es estar comunicado</b>.</p>
+      <p class="lead">Lunes, 8:00. Fin de semana de obras en CITED: han movido equipos, han tocado routers y alguien ha «configurado» la WiFi del Taller. Hoy nadie se comunica con nadie y Dirección quiere además el aula nueva funcionando. Eres el técnico de la red. Tienes <b>${CN.NT} tickets</b> y <b>una sesión de clase</b> para cerrarlos. Una regla: <b>estar conectado no es estar comunicado</b>.</p>
       <div class="mission">
         <div><b>Cómo se juega</b><ul><li>Abre los PC, routers y el punto de acceso desde el mapa</li><li>Comprueba con los comandos de clase (ipconfig, ping, show…)</li><li>Corrige la configuración: IP, máscara, rutas, DHCP, WiFi</li><li>Verifica con un ping y documenta cada incidencia</li></ul></div>
         <div><b>Cada ticket sigue el método</b><ul><li>Observar → Comprobar</li><li>Localizar → Corregir</li><li>Verificar → Documentar</li><li>Las salidas son <b>simuladas</b> pero coherentes</li></ul></div>

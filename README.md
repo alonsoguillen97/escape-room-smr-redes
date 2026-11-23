@@ -32,8 +32,8 @@ js/app.js       Interfaz: mapa, consola flotante, PC Wireless, panel del AP, par
 ```
 
 ## Nota sobre 10, puntos y rapidez
-- La nota aparece **solo en el PDF**. Cada ticket cerrado vale 1,4. Se resta 0,2 por pista y 0,2 por parte erróneo, con un mínimo de 0,7 por ticket cerrado. Un ticket corregido y verificado pero sin parte vale 0,7.
-- La **rapidez** suma hasta 1,6 si se terminan los 6 tickets: 50 minutos de trabajo activo o menos dan el máximo y 120 o más dan 0. Solo cuenta el tiempo con la actividad abierta y en uso.
+- La nota aparece **solo en el PDF**. Cada ticket cerrado vale 1,4. Hay 3 pistas por ticket (la tercera casi da la solución). Se resta 0,2 por pista y 0,2 por parte erróneo, con un mínimo de 0,7 por ticket cerrado. Un ticket corregido y verificado pero sin parte vale 0,7.
+- La **rapidez** suma hasta 1,6 si se terminan los 6 tickets. Está pensada para una sesión de 2 horas exigente: 75 minutos de trabajo activo o menos dan el máximo y 115 o más dan 0. Solo cuenta el tiempo con la actividad abierta y en uso.
 - Los alumnos ven solo los **puntos**, que se ganan: +200 por ticket, +50 si se cierra sin errores, −25 por parte erróneo, −50 por pista y hasta +250 por rapidez.
 - El botón 📄 descarga el informe en cualquier momento. Antes de terminar sale como **PARCIAL**.
 - El código de verificación del pie del PDF empieza por `OR.` y se comprueba en el panel del profesor.

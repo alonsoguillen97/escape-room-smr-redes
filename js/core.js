@@ -12,8 +12,8 @@
     RANKING_URL: "",                     // vacío: no se envía nada fuera; el ranking se monta en el panel con los códigos de los PDF
     // Nota sobre 10 que aparece en el informe PDF: 6 tickets × 1,4 + 1,6 por rapidez
     GRADE: { TICKET: 1.4, HINT: 0.2, WRONG: 0.2, MIN_CLOSED: 0.7, VERIFIED_ONLY: 0.7, SPEED: 1.6 },
-    // Rapidez según minutos de trabajo activo: <= FAST_MIN → máximo; >= SLOW_MIN → 0; lineal entre medias
-    SPEED: { FAST_MIN: 50, SLOW_MIN: 120, IDLE_MIN: 5 },
+    // Rapidez según minutos de trabajo activo (sesión de 2 horas): <= FAST_MIN → máximo; >= SLOW_MIN → 0; lineal entre medias
+    SPEED: { FAST_MIN: 75, SLOW_MIN: 115, IDLE_MIN: 5 }, // clase de 2 h: el máximo solo para los más rápidos
     // Puntos del juego (se ganan): por ticket cerrado, extra si es limpio, penalizaciones y rapidez
     POINTS: { TICKET: 200, CLEAN: 50, WRONG: 25, HINT: 50, SPEED: 250 },
   };
@@ -223,7 +223,7 @@
     // ---- T6
     const T6 = d.t6.router, L6 = LANS[T6], n6 = net[T6], t6h = targetOf[T6];
 
-    return [
+    const list = [
       {
         id: "t1", title: `Aviso de ${L1.dept}`, keyword: "DIRECCIONAMIENTO", place: `Oficina de ${L1.dept}`,
         quote: d.t1.variant === "gw"
@@ -404,6 +404,20 @@
         fault: d.t6.variant === "gw" ? `Pool ${L6.pool}: default-router ${d.t6.wrongGw}` : d.t6.variant === "excl" ? `${T6}: ip dhcp excluded-address ${n6}.1 ${n6}.254` : `Pool ${L6.pool}: network ${d.t6.wrongNet}`,
       },
     ];
+    // Tercera pista: casi la solución (cuesta lo mismo que las otras)
+    const via5 = M5 === "R1" ? `ip route ${net.R3}.0 255.255.255.0 10.0.1.2` : `ip route ${net.R1}.0 255.255.255.0 10.0.2.1`;
+    const last = {
+      t1: d.t1.variant === "net" ? `La IP de ${t1h} tiene que estar en la red ${n1}.0/24. Corrígela en IP Configuration (o pon DHCP).` : d.t1.variant === "mask" ? `La máscara de la oficina es 255.255.255.0 (/24). Corrígela en IP Configuration de ${t1h} (o pon DHCP).` : `La puerta de enlace de ${L1.dept} es ${n1}.1. Corrígela en IP Configuration de ${t1h} (o pon DHCP).`,
+      t2: `En ${T2}: enable → configure terminal → interface ${I2} → no shutdown. Después repite el ping.`,
+      t3: `El aula va en la subred ${sub3(X3)} (máscara ${X3.mask}). R1 G0/2 lleva ${X3.gw} y AULA-1 una IP entre ${off(X3, 2)} y ${X3.last} con gateway ${X3.gw}.`,
+      t4: V4 === "ssid" ? `En PC Wireless conecta el portátil a ${d.ssid} con la clave de la documentación (botón 🗺️).` : V4 === "key" ? `Vuelve a conectar el portátil a ${d.ssid} escribiendo la clave que aparece en el AP (Config · Wireless) o en la documentación.` : `En AP-TALLER pon Seguridad WPA2-Personal con la clave de la documentación y guarda: el portátil se reconectará solo.`,
+      t5: `En ${M5}: enable → configure terminal → ${via5}`,
+      t6: d.t6.variant === "gw" ? `En ${T6}: ip dhcp pool ${L6.pool} → default-router ${n6}.1. Luego ipconfig /renew en ${t6h}.` : d.t6.variant === "excl" ? `En ${T6} las exclusiones van de ${n6}.1 a ${n6}.254: quítalas con no ip dhcp excluded-address y excluye solo de ${n6}.1 a ${n6}.${d.excl[T6]}. Luego ipconfig /renew.` : `En ${T6}: ip dhcp pool ${L6.pool} → network ${n6}.0 255.255.255.0. Luego ipconfig /renew en ${t6h}.`,
+    };
+    // Evidencias admitidas: cualquier comando razonable para ese fallo
+    const moreCmds = { t2: ["ping"], t3: ["show running-config"], t5: ["ping"] };
+    for (const t of list) { t.hints.push(last[t.id]); if (moreCmds[t.id]) t.answer.cmds.push(...moreCmds[t.id]); }
+    return list;
   }
 
   /* ---------- Código de verificación y partidas guardadas ---------- */
