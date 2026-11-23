@@ -1,0 +1,163 @@
+/* =========================================================
+   CÓDIGO ROJO EN LA RED — estilos propios (sobre styles.css)
+   ========================================================= */
+main { max-width: 1320px; }
+.topbar-row, .progress-wrap { max-width: 1320px; }
+
+/* fases */
+.phasebar { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 0 0 16px; }
+.phasebar li { display: flex; align-items: center; gap: 8px; border: 2.5px solid var(--navy); border-radius: 999px; padding: 4px 14px 4px 4px; background: var(--white); font-weight: 800; font-size: .86rem; color: var(--gray-2); }
+.phasebar li span { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--gray); color: var(--navy); font-size: .8rem; }
+.phasebar li.done { color: var(--navy); background: var(--lime-light); }
+.phasebar li.done span { background: var(--lime); border: 2px solid var(--navy); }
+
+/* rejilla del ticket */
+.ticket-grid { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 20px; align-items: start; }
+.workbench { display: grid; gap: 16px; min-width: 0; }
+.ticket-card { padding: 16px 18px; }
+.tk-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: .8rem; }
+.tk-prio { background: var(--danger); color: #fff; font-weight: 800; letter-spacing: .1em; font-size: .68rem; padding: 3px 10px; border-radius: 999px; animation: blink 1.4s infinite; }
+.ticket-card blockquote { margin: 0; font-size: 1.04rem; font-weight: 700; line-height: 1.5; border-left: 5px solid var(--lime); padding-left: 12px; }
+.tk-from { margin: 6px 0 10px; color: var(--gray-2); font-size: .88rem; font-weight: 700; }
+.tk-aff { margin: 0; font-size: .9rem; }
+.dev-chip { font: 700 .82rem var(--mono); border: 2px solid var(--navy); background: var(--lime-light); border-radius: 8px; padding: 1px 8px; cursor: pointer; margin: 2px 0; }
+.dev-chip:hover { background: var(--lime); }
+.method { margin: 0; font-size: .86rem; line-height: 1.6; }
+#closeBtn { width: 100%; }
+#closeBtn:disabled { font-size: .86rem; }
+
+/* mapa */
+.map-card { padding: 0; overflow: hidden; }
+.topo { display: block; width: 100%; height: auto; background: #FBFCFD; }
+.topo .zone { fill: var(--lime-light); stroke: var(--navy); stroke-width: 2; stroke-dasharray: 8 6; opacity: .6; }
+.topo .lan-label text { font: 800 15px var(--font); fill: var(--navy); }
+.topo .lan-label text.mono { font: 700 13px var(--mono); fill: var(--gray-2); }
+.topo .links line { stroke: var(--navy); stroke-width: 5; stroke-linecap: round; }
+.topo .links line.down { stroke: var(--danger); stroke-dasharray: 10 8; }
+.topo .if-label { font: 700 12px var(--mono); fill: var(--navy-2); }
+.topo .dev text.dev-label { font: 800 14px var(--font); fill: var(--navy); text-anchor: middle; }
+.topo .dev:not(.switch) { cursor: pointer; }
+.topo .dev:not(.switch):hover, .topo .dev:focus-visible { filter: drop-shadow(0 0 6px var(--lime)); outline: none; }
+.topo .dev.open text.dev-label { fill: #fff; paint-order: stroke; stroke: var(--navy); stroke-width: 6px; }
+.topo .fail-x { animation: pop .3s; }
+
+/* consola */
+.dock { padding: 0; overflow: hidden; display: flex; flex-direction: column; min-height: 330px; }
+.dock-empty { padding: 40px 20px; text-align: center; font-weight: 700; color: var(--gray-2); }
+.dock-tabs { display: flex; gap: 4px; align-items: flex-end; padding: 8px 8px 0; background: var(--navy); overflow-x: auto; }
+.dock-tab { font: 700 .85rem var(--font); display: flex; align-items: center; gap: 6px; border: 0; border-radius: 10px 10px 0 0; padding: 7px 10px 7px 12px; background: #2A3658; color: #cfd6e6; cursor: pointer; white-space: nowrap; }
+.dock-tab.on { background: var(--bg); color: var(--navy); }
+.dock-tab i { font-style: normal; font-size: .75rem; opacity: .6; padding: 0 4px; border-radius: 4px; }
+.dock-tab i:hover { background: var(--danger); color: #fff; opacity: 1; }
+.sim-tag { margin-left: auto; align-self: center; font: 800 .66rem var(--font); letter-spacing: .14em; color: var(--navy); background: var(--lime); border-radius: 999px; padding: 2px 10px; }
+.pc-views { display: flex; gap: 6px; padding: 8px 10px; background: var(--bg); border-bottom: 2px solid var(--gray); }
+.pc-views button { font: 700 .82rem var(--font); border: 2px solid var(--navy); border-radius: 8px; background: var(--white); padding: 4px 12px; cursor: pointer; }
+.pc-views button.on { background: var(--navy); color: #fff; }
+.dock-body { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.term { flex: 1; background: #0B1430; color: #E8ECF5; font: 13.5px/1.45 var(--mono); padding: 10px 14px; overflow-y: auto; height: 330px; cursor: text; }
+.term-out { margin: 0; white-space: pre-wrap; word-break: break-word; font: inherit; }
+.term-line { display: flex; align-items: center; gap: 0; }
+.term-prompt { white-space: pre; color: var(--lime); font-weight: 700; }
+.term-input { flex: 1; min-width: 40px; background: transparent; border: 0; color: #fff; font: inherit; padding: 0 0 0 2px; min-height: 0; outline: none; caret-color: var(--lime); }
+.term-input:focus { box-shadow: none; }
+
+/* IP Configuration (estilo Packet Tracer) */
+.ipcfg { padding: 16px 18px; }
+.ipcfg-mode { display: flex; gap: 20px; margin-bottom: 12px; font-weight: 800; }
+.ipcfg-mode label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+.ipcfg-mode input { accent-color: var(--navy); width: 18px; height: 18px; }
+.ipcfg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; margin-bottom: 10px; }
+.ipcfg-grid label { font-weight: 800; font-size: .82rem; }
+.ipcfg-grid input { margin-top: 4px; min-height: 40px; padding: 6px 10px; }
+.ipcfg-grid input:disabled { background: var(--gray); color: var(--gray-2); }
+.ipcfg-msg { min-height: 1.4em; font-weight: 800; font-size: .88rem; margin-bottom: 8px; }
+.ipcfg-msg.ok { color: #4b7a00; } .ipcfg-msg.ko { color: var(--danger); }
+
+/* parte de incidencia */
+.report-form { display: grid; gap: 14px; }
+.report-form fieldset { border: 2.5px solid var(--navy); border-radius: 14px; padding: 10px 14px 14px; margin: 0; }
+.report-form legend { font-weight: 800; padding: 0 6px; }
+.report-form select, .report-form textarea { width: 100%; font: inherit; border: 2.5px solid var(--navy); border-radius: 10px; padding: 8px 10px; background: #fff; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip input { position: absolute; opacity: 0; }
+.chip span { display: inline-block; border: 2.5px solid var(--navy); border-radius: 999px; padding: 5px 14px; font-weight: 800; cursor: pointer; background: #fff; }
+.chip input:checked + span { background: var(--lime); }
+.chip input:focus-visible + span { outline: 3px solid var(--lime); outline-offset: 2px; }
+.causes { display: grid; gap: 6px; }
+.cause { display: flex; gap: 10px; align-items: flex-start; border: 2px solid var(--gray); border-radius: 10px; padding: 7px 10px; cursor: pointer; font-weight: 600; }
+.cause:has(input:checked) { border-color: var(--navy); background: var(--lime-light); }
+.cause input { margin-top: 4px; accent-color: var(--navy); }
+.report-form .auto { background: var(--bg); border: 2px dashed var(--gray-2); border-radius: 12px; padding: 10px 14px; font-size: .88rem; }
+.report-form .auto ul { margin: 4px 0 8px; padding-left: 18px; }
+
+.doc-table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: .9rem; }
+.doc-table th { background: var(--navy); color: #fff; text-align: left; padding: 6px 10px; }
+.doc-table td { border-bottom: 1.5px solid var(--gray); padding: 6px 10px; vertical-align: top; }
+.tbl-wrap { overflow-x: auto; }
+.summary-table code { font-size: .78rem; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.win-body h4 { margin: 14px 0 6px; }
+
+@media (max-width: 1050px) {
+  .ticket-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .ipcfg-grid, .grid2 { grid-template-columns: 1fr; }
+  .term { height: 260px; font-size: 12.5px; }
+}
+
+/* informe PDF y ranking */
+.pdf-box { display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; text-align: left; border: 3px solid var(--navy); border-radius: 16px; background: var(--lime-light); padding: 14px 18px; margin: 18px 0 8px; box-shadow: var(--shadow-sm); }
+.pdf-box p { margin: 4px 0 0; }
+.rank-status { font-weight: 800; font-size: .9rem; min-height: 1.2em; }
+.rank-status .btn { padding: 4px 12px; min-height: 0; font-size: .8rem; margin-left: 6px; }
+.linkish { font: inherit; background: none; border: 0; color: var(--gray-2); text-decoration: underline; cursor: pointer; }
+.cli-tip { margin-left: auto; align-self: center; font-size: .76rem; font-weight: 600; color: var(--gray-2); }
+.cli-tip code, .cli-tip kbd { font: 700 .74rem var(--mono); background: var(--white); border: 1.5px solid var(--navy); border-radius: 5px; padding: 0 4px; color: var(--navy); }
+@media (max-width: 900px) { .cli-tip { display: none; } }
+.grade-big { display: inline-flex; align-items: baseline; gap: 8px; background: var(--navy); color: #fff; border: 3px solid var(--navy); border-radius: 18px; padding: 8px 22px; margin: 6px 0 4px; box-shadow: var(--shadow-sm); }
+.grade-big span { font-size: .72rem; font-weight: 800; letter-spacing: .14em; color: var(--lime); }
+.grade-big b { font: 800 2.6rem var(--mono); }
+.grade-big em { font-style: normal; font-weight: 700; opacity: .8; }
+
+/* ---------- Consola como ventana flotante ---------- */
+.dock.float { position: fixed; z-index: 30; right: 24px; bottom: 20px; width: min(780px, calc(100vw - 24px)); height: min(470px, calc(100vh - 90px));
+  min-width: 380px; min-height: 220px; resize: both; overflow: hidden; display: flex; flex-direction: column; box-shadow: 10px 10px 0 var(--navy), 0 18px 50px rgba(16,28,58,.35); animation: pop .2s cubic-bezier(.3,1.4,.5,1); }
+.dock.float[hidden] { display: none; }
+.dock.float .dock-tabs { cursor: move; user-select: none; touch-action: none; }
+.dock.float.dragging { opacity: .92; }
+.dock.float .dock-body { flex: 1; min-height: 0; }
+.dock.float .term { height: auto; flex: 1; min-height: 0; }
+.dock.float .ipcfg { overflow-y: auto; }
+.dock-ctl { display: flex; gap: 4px; margin-left: 8px; align-self: center; }
+.dock-ctl button { font: 800 .9rem var(--font); width: 28px; height: 26px; border-radius: 7px; border: 0; background: #2A3658; color: #fff; cursor: pointer; }
+.dock-ctl button:hover { background: var(--lime); color: var(--navy); }
+.dock-ctl button[data-dclose]:hover { background: var(--danger); color: #fff; }
+.dock.float.min { height: auto !important; resize: none; min-height: 0; }
+.dock.float.min .pc-views, .dock.float.min .dock-body { display: none; }
+.workbench { grid-template-columns: 1fr; }
+@media (max-width: 699px) {
+  .dock.float { left: 0 !important; right: 0; bottom: 0; top: auto !important; width: 100% !important; height: 62vh !important; min-width: 0; resize: none; border-radius: 18px 18px 0 0; box-shadow: 0 -10px 40px rgba(16,28,58,.35); }
+  .dock.float.min { height: auto !important; }
+}
+.term .term-input { background: transparent; border: 0; border-radius: 0; box-shadow: none; min-height: 0; padding: 0 0 0 2px; color: #fff; width: auto; }
+
+/* ---------- Operación Reconexión (SMR): WiFi, aula nueva, punto de acceso ---------- */
+.topo .zone.pending { fill: #fff; opacity: .9; }
+.topo .links line.wifi { stroke: var(--navy); stroke-width: 3; stroke-dasharray: 3 7; }
+.topo .links line.wifi.down { stroke: var(--danger); }
+.ipcfg-grid select { margin-top: 4px; min-height: 40px; padding: 6px 10px; width: 100%; font: inherit; border: 2.5px solid var(--navy); border-radius: 10px; background: #fff; }
+.ipcfg-grid .span2 { grid-column: 1 / -1; }
+.ap-clients { margin: 4px 0 10px; font-size: .9rem; }
+.wifi-status { display: grid; gap: 2px; border: 2.5px solid var(--navy); border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; }
+.wifi-status.ok { background: var(--lime-light); }
+.wifi-status.ko { background: var(--danger-light); }
+.wifi-table td, .wifi-table th { padding: 6px 8px; }
+.wifi-table small { color: var(--gray-2); font-weight: 700; }
+.wifi-key { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin: 12px 0; }
+.wifi-key label { flex: 1; min-width: 220px; font-weight: 800; font-size: .82rem; }
+.wifi-key input { display: block; width: 100%; margin-top: 4px; min-height: 40px; padding: 6px 10px; }
+.bars { display: inline-flex; gap: 2px; align-items: flex-end; height: 18px; }
+.bars i { width: 5px; background: var(--gray); border-radius: 1px; }
+.bars i.on { background: var(--navy); }
+[hidden] { display: none !important; }
